@@ -6,7 +6,8 @@ let g:loaded_CodeGra_vim = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
-command! CGShowLineFeedback call codegra#show_line_feedback()
-command! CGEditLineFeedback call codegra#edit_line_feedback()
+command! CGShowLineFeedback call codegrade#show_line_feedback()
+command! CGEditLineFeedback call codegrade#edit_line_feedback()
+command! CGDeleteLineFeedback call codegrade#delete_line_feedback()
 
 let &cpo = s:save_cpo

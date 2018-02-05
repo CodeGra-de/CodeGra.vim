@@ -42,6 +42,14 @@ function! <SID>IsCGSubmission(buf)
 	return len(cg_sub_id)
 endfunction
 
+function! <SID>FillQuickFixList(buf)
+	let comments = values(<SID>GetLineFeedback(a:buf))
+        call sort(comments, {a, b -> a['lnum'] - b['lnum']})
+
+	call setqflist(comments)
+	cwindow
+endfunction
+
 function! <SID>MakeComment(buf, lnum, text)
 	return {
 		\ 'bufnr': a:buf,
@@ -52,7 +60,7 @@ function! <SID>MakeComment(buf, lnum, text)
 endfunction
 
 function! <SID>GetLineFeedback(buf) abort
-	let comments = getbufvar(a:buf, 'codegra_de_line_feedback', [])
+	let comments = getbufvar(a:buf, 'codegra_de_line_feedback', {})
 	if !empty(comments) | return comments | endif
 
 	if !<SID>IsCGSubmission(a:buf)
@@ -62,37 +70,29 @@ function! <SID>GetLineFeedback(buf) abort
 	let filepath = fnamemodify(bufname(a:buf), ':p')
 	let json = <SID>CGAPI('get-comment', filepath)
 
-	let comments = map(json#parse(json), {idx, val ->
-		\ <SID>MakeComment(a:buf, val['line'], val['content'])
-	\ })
+	for comment in json#parse(json)
+		let comment = <SID>MakeComment(a:buf, comment['line'], comment['content'])
+		let comments[comment['lnum']] = comment
+	endfor
 
 	call setbufvar(a:buf, 'codegra_de_line_feedback', comments)
 	return comments
 endfunction
 
 function! <SID>GetCommentAtLine(buf, lnum) abort
-	for comment in <SID>GetLineFeedback(a:buf)
-		if comment['lnum'] == a:lnum
-			return comment
-		endif
-	endfor
+	let comments = <SID>GetLineFeedback(a:buf)
 
-	return {}
+	return get(comments, a:lnum, {})
 endfunction
 
 function! <SID>InsertCommentAtLine(buf, lnum, text)
-	let comment = <SID>MakeComment(a:buf, a:lnum, a:text)
-	let comments = getbufvar(a:buf, 'codegra_de_line_feedback')
-        for i in range(len(comments))
-		if comments[i]['lnum'] == a:lnum
-			let comments[i]['text'] = a:text
-			return
-		elseif comments[i]['lnum'] > a:lnum
-			call insert(comments, comment, i)
-			return
-		endif
-	endfor
-	call add(comments, comment)
+	let comments = <SID>GetLineFeedback(a:buf)
+
+        if has_key(comments, a:lnum)
+		let comments[a:lnum]['text'] = a:text
+	else
+        	let comments[a:lnum] = <SID>MakeComment(a:buf, a:lnum, a:text)
+	endif
 
 	" TODO: reload quickfix window
 endfunction
@@ -109,13 +109,23 @@ function! <SID>SetCommentAtLine(buf, lnum)
 	setlocal nomodified
 endfunction
 
-function! codegra#show_line_feedback() abort
-	let comments = <SID>GetLineFeedback(bufnr('%'))
-	call setqflist(comments)
-	cwindow
+function! <SID>DeleteCommentAtLine(buf, lnum)
+	let comments = <SID>GetLineFeedback(a:buf)
+
+	if has_key(comments, a:lnum)
+		let file = bufname(a:buf)
+		call <SID>CGAPI('delete-comment', file, a:lnum)
+		call remove(comments, a:lnum)
+	endif
 endfunction
 
-function! codegra#edit_line_feedback() abort
+function! codegrade#show_line_feedback() abort
+	let buf = bufnr('%')
+
+	call <SID>FillQuickFixList(buf)
+endfunction
+
+function! codegrade#edit_line_feedback() abort
 	let buf = bufnr('%')
 	let lnum = line('.')
 	let comment = <SID>GetCommentAtLine(buf, lnum)
@@ -129,4 +139,11 @@ function! codegra#edit_line_feedback() abort
 	setlocal nomodified
 
 	execute 'autocmd BufWriteCmd <buffer> call <SID>SetCommentAtLine(' . buf . ', ' . lnum . ')'
+endfunction
+
+function! codegrade#delete_line_feedback() abort
+	let buf = bufnr('%')
+	let lnum = line('.')
+
+	call <SID>DeleteCommentAtLine(buf, lnum)
 endfunction
