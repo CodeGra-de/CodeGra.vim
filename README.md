@@ -2,8 +2,6 @@
 
 *The* Vim plugin for CodeGra.de
 
-![](codegra.vim.gif)
-
 ## Dependencies
 
 CodeGra.fs must be installed and both `cgfs` and the helper program

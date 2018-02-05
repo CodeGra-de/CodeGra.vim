@@ -9,12 +9,13 @@ endfunction
 
 " Open the given file in a split of 10 lines
 " below the current window.
-function! <SID>OpenSplitBelow(file) abort
-	let old_sb = &splitbelow
-	set splitbelow
-	execute 'split ' . a:file
-	let &splitbelow = old_sb
+function! <SID>OpenSplitBelow(filename) abort
+	execute 'below split ' . a:filename
 	resize 10
+	setlocal bufhidden=wipe
+	setlocal nobuflisted
+	setlocal buftype=acwrite
+	setlocal noswapfile
 endfunction
 
 function! <SID>FindFileFromRoot(path, filename) abort
@@ -31,8 +32,8 @@ function! <SID>FindFileFromRoot(path, filename) abort
 endfunction
 
 function! OpenCGFile(filename) abort
-	let filepath = <SID>FindFileFromRoot(filename)
-	call <SID>OpenSplitBelow(filepath)
+	let filepath = <SID>FindFileFromRoot(a:filename)
+	execute 'split ' . filepath
 endfunction
 
 function! <SID>IsCGSubmission(buf)
@@ -52,7 +53,7 @@ endfunction
 
 function! <SID>GetLineFeedback(buf) abort
 	let comments = getbufvar(a:buf, 'codegra_de_line_feedback', [])
-	if len(comments) | return comments | endif
+	if !empty(comments) | return comments | endif
 
 	if !<SID>IsCGSubmission(a:buf)
 		throw 'This is not a CodeGra.de buffer!'
@@ -104,6 +105,8 @@ function! <SID>SetCommentAtLine(buf, lnum)
 
 	call <SID>CGAPI('set-comment', file, a:lnum, text)
 	call <SID>InsertCommentAtLine(a:buf, a:lnum, text)
+
+	setlocal nomodified
 endfunction
 
 function! codegra#show_line_feedback() abort
@@ -118,25 +121,12 @@ function! codegra#edit_line_feedback() abort
 	let comment = <SID>GetCommentAtLine(buf, lnum)
 	let text = get(comment, 'text', '')
 
-	let tmpfile = tempname()
-	call <SID>OpenSplitBelow(tmpfile)
+	let temp = tempname()
+	call <SID>OpenSplitBelow(temp)
 
 	call append(0, split(text, "\n"))
 	call setpos('.', [0, 0, 0])
+	setlocal nomodified
 
-	let grpname = 'cg_comment_grp_' . fnamemodify(tmpfile, ':t')
-
-	execute 'augroup ' . grpname
-	execute 'autocmd BufWritePost ' . tmpfile .
-		\ ' call <SID>SetCommentAtLine(' . buf . ', ' . lnum . ')'
-	execute 'autocmd BufDelete,BufWipeout,BufUnload ' . tmpfile .
-		\ ' silent! augroup! ' . grpname
-	augroup END
-endfunction
-
-function! codegra#reload_line_feedback() abort
-	if exists('b:codegra_de_line_feedback')
-		unlet b:codegra_de_line_feedback
-	endif
-	call <SID>GetLineFeedback(bufnr('%'))
+	execute 'autocmd BufWriteCmd <buffer> call <SID>SetCommentAtLine(' . buf . ', ' . lnum . ')'
 endfunction
