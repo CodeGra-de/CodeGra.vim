@@ -31,8 +31,9 @@ function! <SID>FindFileFromRoot(path, filename) abort
 	return ''
 endfunction
 
-function! OpenCGFile(filename) abort
-	let filepath = <SID>FindFileFromRoot(a:filename)
+function! <SID>OpenCGFile(filename) abort
+	let path = fnamemodify(expand('%'), ':p:h')
+	let filepath = <SID>FindFileFromRoot(path, a:filename)
 	execute 'split ' . filepath
 endfunction
 
@@ -146,4 +147,20 @@ function! codegrade#delete_line_feedback() abort
 	let lnum = line('.')
 
 	call <SID>DeleteCommentAtLine(buf, lnum)
+endfunction
+
+function! codegrade#edit_feedback()
+	call <SID>OpenCGFile('.cg-feedback')
+endfunction
+
+function! codegrade#edit_grade()
+	call <SID>OpenCGFile('.cg-grade')
+endfunction
+
+function! codegrade#open_rubric_editor()
+	call <SID>OpenCGFile('.cg-edit-rubric.md')
+endfunction
+
+function! codegrade#open_rubric_selector()
+	call <SID>OpenCGFile('.cg-rubric.md')
 endfunction
