@@ -18,9 +18,13 @@ function! <SID>OpenSplitBelow(filename) abort
 	setlocal noswapfile
 endfunction
 
+function! <SID>CompareComments(a, b) abort
+	return a['lnum'] - b['lnum']
+endfunction
+
 function! <SID>FillQuickFixList(buf) abort
 	let comments = values(<SID>GetLineFeedback(a:buf))
-        call sort(comments, {a, b -> a['lnum'] - b['lnum']})
+        call sort(comments, function('<SID>CompareComments'))
 
 	call setqflist(comments)
 	cwindow
