@@ -10,7 +10,7 @@ endfunction
 " Open the given file in a split of 10 lines
 " below the current window.
 function! <SID>OpenSplitBelow(filename) abort
-	execute 'below split ' . a:filename
+	execute 'below split ' . fnameescape(a:filename)
 	resize 10
 	setlocal bufhidden=wipe
 	setlocal nobuflisted
