@@ -10,7 +10,7 @@ endfunction
 " Open the given file in a split of 10 lines
 " below the current window.
 function! <SID>OpenSplitBelow(filename) abort
-	execute 'below split ' . a:filename
+	execute 'below split ' . fnameescape(a:filename)
 	resize 10
 	setlocal bufhidden=wipe
 	setlocal nobuflisted
@@ -18,9 +18,13 @@ function! <SID>OpenSplitBelow(filename) abort
 	setlocal noswapfile
 endfunction
 
+function! <SID>CompareComments(a, b) abort
+	return a['lnum'] - b['lnum']
+endfunction
+
 function! <SID>FillQuickFixList(buf) abort
 	let comments = values(<SID>GetLineFeedback(a:buf))
-        call sort(comments, {a, b -> a['lnum'] - b['lnum']})
+        call sort(comments, function('<SID>CompareComments'))
 
 	call setqflist(comments)
 	cwindow
