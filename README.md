@@ -2,10 +2,41 @@
 
 *The* Vim plugin for CodeGra.de
 
-## Dependencies
+## Installation
 
-CodeGra.fs must be installed and both `cgfs` and the helper program
-`cgapi-consumer` must be available from the user's `$PATH`.
+#### Dependencies
+
+Make sure [CodeGra.fs](https://github.com/CodeGra-de/CodeGra.fs) is installed
+and both `cgfs` and the helper program `cgapi-consumer` must be available from
+the user's `PATH` environment variable.
+
+#### Vim 8 and up
+
+```sh
+mkdir ~/.vim/pack/CodeGrade/start
+git clone https://github.com/CodeGra-de/CodeGra.vim ~/.vim/pack/CodeGrade/start
+```
+
+#### Up to Vim 8
+
+Use your package manager of choice, below examples for few popular ones.
+
+```sh
+# vim-plug
+call plug#begin()
+Plug 'CodeGra-de/CodeGra.vim'
+call plug#end()
+
+# Vundle
+call vundle#begin()
+Plugin 'CodeGra-de/CodeGra.vim'
+call vundle#end()
+filetype plugin on
+
+# minpac
+call minpac#init()
+call minpac#add('CodeGra-de/CodeGra.vim')
+```
 
 ## Usage
 
