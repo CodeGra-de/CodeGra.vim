@@ -14,7 +14,7 @@ the user's `PATH` environment variable.
 
 ```sh
 mkdir ~/.vim/pack/CodeGrade/start
-git clone https://github.com/CodeGra-de/CodeGra.vim ~/.vim/pack/CodeGrade/start
+git clone https://github.com/CodeGra-de/CodeGra.vim ~/.vim/pack/CodeGrade/start/CodeGra.vim
 ```
 
 #### Up to Vim 8
