@@ -21,19 +21,19 @@ git clone https://github.com/CodeGra-de/CodeGra.vim ~/.vim/pack/CodeGrade/start/
 
 Use your package manager of choice, below examples for few popular ones.
 
-```sh
-# vim-plug
+```vim
+" vim-plug
 call plug#begin()
 Plug 'CodeGra-de/CodeGra.vim'
 call plug#end()
 
-# Vundle
+" Vundle
 call vundle#begin()
 Plugin 'CodeGra-de/CodeGra.vim'
 call vundle#end()
 filetype plugin on
 
-# minpac
+" minpac
 call minpac#init()
 call minpac#add('CodeGra-de/CodeGra.vim')
 ```
