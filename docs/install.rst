@@ -17,19 +17,22 @@ repository inside this folder via this command:
 Up to Vim 8
 ------------
 Installing the CodeGrade Vim plugin for Vim versions up to 8 is done using your
-package manager of choice. Some examples for popular package managers::
+package manager of choice. Some examples for popular package managers
 
-    # vim-plug
+
+.. code-block:: vim
+
+    " vim-plug
     call plug#begin()
     Plug 'CodeGra-de/CodeGra.vim'
     call plug#end()
 
-    # Vundle
+    " Vundle
     call vundle#begin()
     Plugin 'CodeGra-de/CodeGra.vim'
     call vundle#end()
     filetype plugin on
 
-    # minpac
+    " minpac
     call minpac#init()
     call minpac#add('CodeGra-de/CodeGra.vim')

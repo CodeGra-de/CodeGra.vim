@@ -70,7 +70,7 @@ author = 'CodeGrade Team'
 #
 # The short X.Y version.
 with open("../VERSION", 'r') as f:
-    version = f.read()
+    version = f.read().strip()
 
 # The full version, including alpha/beta/rc tags.
 release = version
