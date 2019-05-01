@@ -2,7 +2,9 @@ Installation
 =============
 The CodeGrade filesystem has to be installed and both the ``cgfs`` and the
 ``cgapi-consumer`` helper program must be available from the user's ``$PATH``
-to successfully install and use the Vim editor plugin.
+to successfully install and use the Vim editor plugin. This should be
+automatically done when installing the CodeGrade Filesystem with the official
+installer.
 
 Vim 8 and up
 -------------
